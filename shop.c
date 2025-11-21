@@ -34,29 +34,40 @@ void displayProducts() {
 // Add item to cart
 void addToCart() {
     int id, qty;
-    displayProducts();
+    char choice;
 
-    printf("\nEnter Product ID to add: ");
-    scanf("%d", &id);
+    while (1) {
+        displayProducts();
 
-    if (id < 1 || id > MAX_PRODUCTS) {
-        printf("Invalid ID!\n");
-        return;
+        printf("\nEnter Product ID to add: ");
+        scanf("%d", &id);
+
+        if (id < 1 || id > MAX_PRODUCTS) {
+            printf("Invalid ID!\n");
+        } else {
+            printf("Enter Quantity: ");
+            scanf("%d", &qty);
+
+            if (qty <= 0) {
+                printf("Invalid quantity!\n");
+            } else {
+                cart[cartCount].product = &products[id - 1];
+                cart[cartCount].quantity = qty;
+                cartCount++;
+
+                printf("Item added successfully!\n");
+            }
+        }
+
+        // Ask user if they want to add more
+        printf("\nDo you want to add more items? (y/n): ");
+        scanf(" %c", &choice);   // SPACE before %c to clear buffer
+
+        if (choice == 'n' || choice == 'N') {
+            printf("\nReturning to menu...\n");
+            break; 
+        }
     }
-
-    printf("Enter Quantity: ");
-    scanf("%d", &qty);
-
-    if (qty <= 0) {
-        printf("Invalid quantity!\n");
-        return;
-    }
-
-    cart[cartCount].product = &products[id - 1];
-    cart[cartCount].quantity = qty;
-    cartCount++;
-
-    printf("Added to cart!\n");
 }
 
 // View the cart
@@ -90,6 +101,7 @@ void checkout() {
 
     float total = 0;
 
+    // Calculate total
     for (int i = 0; i < cartCount; i++) {
         total += cart[i].product->price * cart[i].quantity;
     }
@@ -97,17 +109,50 @@ void checkout() {
     printf("\n===== CHECKOUT =====\n");
     printf("Subtotal: ₹%.2f\n", total);
 
-    // Discount rule
+    // Discount
     float discount = 0;
     if (total > 5000) {
-        discount = total * 0.10; // 10%
+        discount = total * 0.10;
         printf("Discount (10%%): ₹%.2f\n", discount);
     }
 
-    printf("Final Total: ₹%.2f\n", total - discount);
+    float finalAmount = total - discount;
+    printf("Final Total: ₹%.2f\n", finalAmount);
 
-    cartCount = 0; // Clear cart
-    printf("\nOrder Placed Successfully!\n");
+    // --- Get User Details ---
+    char name[50];
+    char phone[20];
+    char address[100];
+
+  printf("\n===== CUSTOMER DETAILS =====\n");
+
+getchar();
+
+printf("Enter your name: ");
+fgets(name, sizeof(name), stdin);
+
+printf("Enter phone number: ");
+fgets(phone, sizeof(phone), stdin);
+
+printf("Enter address: ");
+fgets(address, sizeof(address), stdin);
+
+name[strcspn(name, "\n")] = 0;
+phone[strcspn(phone, "\n")] = 0;
+address[strcspn(address, "\n")] = 0;
+
+
+    // Final confirmation
+    printf("\n===== ORDER SUMMARY =====\n");
+    printf("Name     : %s\n", name);
+    printf("Phone    : %s\n", phone);
+    printf("Address  : %s\n", address);
+    printf("Amount   : ₹%.2f\n", finalAmount);
+
+    printf("\nOrder Placed Successfully! Thank you for shopping!\n");
+
+    // Clear cart
+    cartCount = 0;
 }
 
 // Menu
